@@ -9,9 +9,11 @@ from loss_function import loss_function
 import torch
 from config import config
 from IOU import iou_pytorch,iou_numpy
+import numpy as np
 
 
 def learning_function(model,images_train, labels_train,images_test,labels_test):
+    
     
     ''' #################################################  set up optim  ################################################### '''
     device    = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -25,8 +27,14 @@ def learning_function(model,images_train, labels_train,images_test,labels_test):
     batch_size          = config['batch_size']
         
     Loss_train,Loss_test,train_ious,test_ious = [],[],[],[]
-    best_loss = float('inf')
+    best_iou = 0
     for i in range(Epochs):
+        
+        arr = np.arange(images_train.shape[0])
+        np.random.shuffle(arr)
+
+        images_train   = images_train[arr]
+        labels_train   = labels_train[arr]
         
         model.train()
         ll         = 0
@@ -96,7 +104,7 @@ def learning_function(model,images_train, labels_train,images_test,labels_test):
         print("   #####  Train Epoch: {} train_iou: {:0.4f} test_iou: {:0.4f}".format(i,train_ious[-1],test_ious[-1]))
         print('##########################################################################################################')
         
-        if Loss_train[-1]<best_loss:
-            best_loss = Loss_train[-1]
+        if test_ious[-1]>best_iou:
+            best_iou = test_ious[-1]
             torch.save(model,'models/model.pth')
-    return Loss_train,Loss_test
+    return train_ious,test_ious

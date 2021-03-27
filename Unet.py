@@ -67,8 +67,12 @@ class UNet(nn.Module):
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
         )
-        self.final = nn.Conv2d(64, num_classes, kernel_size=1)
+        self.b_final = nn.Conv2d(64, 32, kernel_size=1)
+        self.final   = nn.Conv2d(32, num_classes, kernel_size=1)
         self.softmax = nn.Softmax(dim=1)
+        
+        self.relu1 = nn.ReLU(inplace=True)
+        self.relu2 = nn.ReLU(inplace=True)
         #initialize_weights(self)
 
     def forward(self, x):
@@ -83,7 +87,9 @@ class UNet(nn.Module):
         dec3 = self.dec3(torch.cat([dec4, F.interpolate(enc3, dec4.size()[2:], mode='bilinear')], 1))
         dec2 = self.dec2(torch.cat([dec3, F.interpolate(enc2, dec3.size()[2:], mode='bilinear')], 1))
         dec1 = self.dec1(torch.cat([dec2, F.interpolate(enc1, dec2.size()[2:], mode='bilinear')], 1))
-        final = self.final(dec1)
+        
+        b_final = self.relu1(self.b_final(dec1))
+        final   = self.relu2(self.final(b_final))
         
         out = F.interpolate(final, x.size()[2:], mode='bilinear')
         out = self.softmax(out)

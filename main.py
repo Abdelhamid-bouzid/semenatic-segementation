@@ -16,7 +16,7 @@ images_train, labels_train, images_test, labels_test = load_data()
 device    = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = UNet(2)
 model = model.float().to(device=device, dtype=torch.float)
-#summary(model, (3, 480 ,480))
+summary(model, (3, 480 ,640))
 
 Loss_train,Loss_test = learning_function(model,images_train, labels_train,images_test,labels_test)
 
