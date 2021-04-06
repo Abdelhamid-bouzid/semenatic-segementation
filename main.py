@@ -10,14 +10,21 @@ from learning_function import learning_function
 from torchsummary import summary
 from plot import plot
 from Unet import UNet
+from config import config
 
-images_train, labels_train, images_test, labels_test = load_data()
+#####################################################################################################
+######################################## load data ##################################################
+#####################################################################################################
+l_train = load_data("data", "l_train")
+test    = load_data("data", "test")
 
-device    = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#####################################################################################################
+#################################### student model ##################################################
+#####################################################################################################
 model = UNet(2)
-model = model.float().to(device=device, dtype=torch.float)
-summary(model, (3, 480 ,640))
+#summary(S_model, (3, 480 ,640))
 
-Loss_train,Loss_test = learning_function(model,images_train, labels_train,images_test,labels_test)
+
+Loss_train,Loss_test = learning_function(model,l_train,test)
 
 plot(Loss_train,Loss_test)

@@ -49,7 +49,7 @@ class _DecoderBlock(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, transform_fn=None):
         super(UNet, self).__init__()
         self.enc1 = _EncoderBlock(3, 64)
         self.enc2 = _EncoderBlock(64, 128)
@@ -73,9 +73,25 @@ class UNet(nn.Module):
         
         self.relu1 = nn.ReLU(inplace=True)
         self.relu2 = nn.ReLU(inplace=True)
+        
+        
         #initialize_weights(self)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")    
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.xavier_normal_(m.weight)
+                nn.init.constant_(m.bias, 0)
 
-    def forward(self, x):
+        self.transform_fn = transform_fn
+
+    def forward(self, x, trans_flag=False):
+        if trans_flag:
+            x = self.transform_fn(x)
+            
         enc1 = self.enc1(x)
         enc2 = self.enc2(enc1)
         enc3 = self.enc3(enc2)
@@ -92,5 +108,10 @@ class UNet(nn.Module):
         final   = self.relu2(self.final(b_final))
         
         out = F.interpolate(final, x.size()[2:], mode='bilinear')
-        out = self.softmax(out)
+        #out = self.softmax(out)
         return out
+    
+    def update_batch_stats(self, flag):
+        for m in self.modules():
+            if isinstance(m, nn.BatchNorm2d):
+                m.update_batch_stats = flag
