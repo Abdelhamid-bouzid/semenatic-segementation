@@ -6,12 +6,12 @@ Created on Fri Mar 19 20:45:25 2021
 """
 config = {
     
-    "Epochs"         : 300,       # Number of epochs
-    "learning_rate"  : 10**-5,     # learning rate
-    "decay_lr"       : 0.1,        # deacy learing
-    "decay_lr_epoch" : 300,         # deacy learning rate
+    "iteration"      : 50000,      # iterataions
+    "learning_rate"  : 10**-3,     # learning rate
+    "decay_lr"       : 0.5,        # deacy learing rate factor
+    "decay_lr_iter"  : 5000,        # deacy learning rate iterataion
     "min_lr"         : 10**-5,     # min learing
-    "batch_size"     : 8,         # batch size
+    "batch_size"     : 16,         # batch size
     "optimizer_flag" : 'Adam',     # Optimizer
     
     "train points"   : 300,        # train data points
@@ -19,10 +19,13 @@ config = {
     "threshold loss" : 10,         # threshold loss
     
     
-    "data_path"      : 'data/data.npy',
-    "labels_path"    : 'data/labels.npy',
+    "transform"      : [False, False, True], # flip, rnd crop, gaussian noise
     
-    "iteration"      : 50000,
+    "ema_factor"     : 0.95,
+    "consis_coef"    : 0.3,
+    "alpha"          : 0.1,
     
-    "test_model_cycel" :500,
+    "warmup"         : 20000,
+    
+    "test_model_cycel" :1000,
 }

@@ -15,8 +15,8 @@ from config import config
 #####################################################################################################
 ######################################## load data ##################################################
 #####################################################################################################
-l_train = load_data("data", "l_train")
-test    = load_data("data", "test")
+l_train = load_data(r"D:/MHS segmentation/data/data/l_train.npy")
+test    = load_data(r"D:/MHS segmentation/data/data/test.npy")
 
 #####################################################################################################
 #################################### student model ##################################################
@@ -25,6 +25,6 @@ model = UNet(2)
 #summary(S_model, (3, 480 ,640))
 
 
-Loss_train,Loss_test = learning_function(model,l_train,test)
+train_ious,test_ious = learning_function(model,l_train,test)
 
-plot(Loss_train,Loss_test)
+plot(train_ious,test_ious)

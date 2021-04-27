@@ -36,7 +36,9 @@ def learning_function(model,l_train,test):
     Loss_train,Loss_test,train_ious,test_ious = [],[],[],[]
     best_iou  = 0
     iteration = 0
+    train_iou = []
     for l_input, l_target in l_loader:
+        
         iteration += 1
         
         l_input, l_target = l_input.to(device).float(), l_target.to(device).long()
@@ -51,7 +53,11 @@ def learning_function(model,l_train,test):
         optimizer.step()
         
         iou = iou_pytorch(outputs.argmax(dim=1).cpu(),l_target.argmax(dim=1).cpu())
-        train_ious.append(iou)
+        train_iou.append(iou)
+        
+        if iteration%config["decay_lr_iter"]==0:
+            if optimizer.param_groups[0]["lr"]>config["min_lr"]:
+                optimizer.param_groups[0]["lr"] *= config["decay_lr"]
         
         print('##########################################################################################################')
         print("   #####  Train iteration: {} train_loss: {:0.4f} train_iou: {:0.4f}".format(iteration,loss.item(),iou))
@@ -60,16 +66,19 @@ def learning_function(model,l_train,test):
         if iteration%config["test_model_cycel"]==0:
             model.eval()
             test_iou  = 0
-            for l_input, l_target in test_loader:
-                l_input, l_target = l_input.to(device).float(), l_target.to(device).long()
-                
-                outputs = model(l_input)
-                
-                iou = iou_pytorch(outputs.argmax(dim=1).cpu(),l_target.argmax(dim=1).cpu())
-                test_iou += iou
+            with torch.no_grad(): 
+                for l_input, l_target in test_loader:
+                    l_input, l_target = l_input.to(device).float(), l_target.to(device).long()
+                    
+                    outputs = model(l_input)
+                    
+                    iou = iou_pytorch(outputs.argmax(dim=1).cpu(),l_target.argmax(dim=1).cpu())
+                    test_iou += iou
                     
             test_iou = test_iou/len(test)
-        
+            test_ious.append(test_iou)
+            train_ious.append(sum(train_iou)/len(train_iou))
+            train_iou = []
             print('**********************************************************************************************************')
             print("   #####  Train iteration: {} test_iou: {:0.4f} ".format(iteration,iou))
             print('**********************************************************************************************************')

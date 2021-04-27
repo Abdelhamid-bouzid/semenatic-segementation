@@ -88,8 +88,8 @@ class UNet(nn.Module):
 
         self.transform_fn = transform_fn
 
-    def forward(self, x, trans_flag=False):
-        if trans_flag:
+    def forward(self, x):
+        if self.training and self.transform_fn is not None:
             x = self.transform_fn(x)
             
         enc1 = self.enc1(x)

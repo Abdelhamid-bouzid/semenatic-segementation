@@ -10,11 +10,12 @@ import numpy as np
 #from config import config
 
 def plot(train_ious,test_ious):
-    x = np.arange(len(train_ious))
-    plt.plot(x,train_ious,label='Train loss', c='r')
-    plt.plot(x,test_ious,label='Test loss', c='b')
+    x1 = np.arange(len(train_ious))
+    x2 = np.arange(len(test_ious))
+    plt.plot(x1,train_ious,label='Train loss', c='r')
+    plt.plot(x2,test_ious,label='Test loss', c='b')
     #plt.axhline(config["threshold loss"],0,len(Loss_train),label='loss threshold',c='k')
     plt.xlabel('Epoch')
-    plt.ylabel('loss')
+    plt.ylabel('IOU')
     plt.legend()
     plt.show()

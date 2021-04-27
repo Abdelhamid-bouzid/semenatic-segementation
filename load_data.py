@@ -9,8 +9,8 @@ import os
 
 
 class load_data:
-    def __init__(self, root, split="l_train"):
-        self.dataset = np.load(os.path.join(root, split+".npy"), allow_pickle=True)
+    def __init__(self, path):
+        self.dataset = np.load(path, allow_pickle=True)
 
     def __getitem__(self, idx):
         image = self.dataset["images"][idx]
